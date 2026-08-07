@@ -3,15 +3,12 @@
   kubernetes.core.helm_repository:
     name: argo
     repo_url: https://argoproj.github.io/argo-helm
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
 
 - name: Ensure argocd namespace exists
   kubernetes.core.k8s:
     name: "{{ argocd_namespace }}"
     kind: Namespace
     api_version: v1
-    kubeconfig: "{{ kubeconfig_path }}"
     state: present
 
 - name: Install ArgoCD
@@ -24,7 +21,6 @@
     chart_version: "{{ argocd_chart_version }}"
     state: present
     disable_hook: true
-    kubeconfig: "{{ kubeconfig_path }}"
 
 - name: Wait for ArgoCD server to be ready
   kubernetes.core.k8s_info:
@@ -32,39 +28,13 @@
     namespace: "{{ argocd_namespace }}"
     label_selectors:
       - app.kubernetes.io/name=argocd-server
-    kubeconfig: "{{ kubeconfig_path }}"
   register: argocd_pods
   until: argocd_pods.resources | length > 0 and argocd_pods.resources[0].status.phase == 'Running'
   retries: 30
   delay: 5
 
-- name: Enable anonymous access
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_path }}"
-    api_version: v1
-    kind: ConfigMap
-    name: argocd-cm
-    namespace: "{{ argocd_namespace }}"
-    resource_definition:
-      data:
-        anonymous.enabled: "true"
-        users.anonymous.enabled: "true"
-        server.insecure: "true"
-
-- name: Set default RBAC policy to readonly
-  kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_path }}"
-    api_version: v1
-    kind: ConfigMap
-    name: argocd-rbac-cm
-    namespace: "{{ argocd_namespace }}"
-    resource_definition:
-      data:
-        policy.default: "role:readonly"
-
 - name: Create ArgoCD AppProject
   kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_path }}"
     state: present
     definition:
       apiVersion: argoproj.io/v1alpha1
@@ -85,7 +55,6 @@
 
 - name: Create ArgoCD Application for GitOps
   kubernetes.core.k8s:
-    kubeconfig: "{{ kubeconfig_path }}"
     state: present
     definition:
       apiVersion: argoproj.io/v1alpha1
@@ -112,7 +81,6 @@
     kind: Service
     name: argocd-server
     namespace: "{{ argocd_namespace }}"
-    kubeconfig: "{{ kubeconfig_path }}"
   register: argocd_service
 
 - name: Display deployment info
