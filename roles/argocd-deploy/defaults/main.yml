@@ -1,0 +1,13 @@
+argocd_release_name: argocd
+argocd_namespace: argocd
+argocd_chart_version: 7.7.7
+kubeconfig_path: "{{ kubeconfig_file | default('/var/folders/qw/9496wftj1sg8gy8y00r5m1p00000gp/T/opencode/k8s-cp-kubeconfig') }}"
+argocd_helm_values:
+  server:
+    service:
+      type: NodePort
+      nodePort: 30080
+    config:
+      anonymous.enabled: "true"
+  rbac:
+    policy_default: "role:readonly"
