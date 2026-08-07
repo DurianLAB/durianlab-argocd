@@ -28,9 +28,10 @@ spec:
         - name: workspace
           mountPath: /home/jenkins/agent
   volumes:
-    - name: ansible-config
-      configMap:
-        name: ansible-config
+        - name: ansible-config
+          configMap:
+            name: ansible-config
+            optional: true
     - name: kubeconfig
       secret:
         secretName: jenkins-kubeconfig
