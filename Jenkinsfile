@@ -224,7 +224,7 @@ pipelining = True
     post {
         always {
             archiveArtifacts artifacts: '*.log', allowEmptyArchive: true
-            cleanWs()
+            deleteDir()
         }
         success {
             echo 'ArgoCD deployment pipeline succeeded!'
