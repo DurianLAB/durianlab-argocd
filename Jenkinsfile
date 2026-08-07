@@ -10,8 +10,20 @@ spec:
   serviceAccountName: jenkins-agent
   containers:
     - name: ansible
-      image: docker.io/ansible/ansible:latest
+      image: python:3.12-slim
       imagePullPolicy: Always
+      command:
+        - sleep
+        - infinity
+      tty: true
+      env:
+        - name: HOME
+          value: /home/jenkins
+        - name: KUBECONFIG
+          value: /home/jenkins/.kube/config
+      volumeMounts:
+        - name: workspace
+          mountPath: /home/jenkins/agent
       command:
         - cat
       tty: true
@@ -119,8 +131,8 @@ pipelining = True
             steps {
                 container('ansible') {
                     sh '''
-                        pip install --upgrade pip
-                        pip install ansible ansible-lint kubernetes netaddr
+                        pip install --upgrade pip && \
+                        pip install ansible ansible-lint kubernetes netaddr && \
                         ansible-galaxy collection install -r requirements.yml || true
                     '''
                 }
