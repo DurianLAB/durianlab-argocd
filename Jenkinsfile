@@ -10,7 +10,7 @@ spec:
   serviceAccountName: jenkins-agent
   containers:
     - name: ansible
-      image: quay.io/ansible/ansible-core:2.17
+      image: docker.io/ansible/ansible-core:2.17
       imagePullPolicy: Always
       command:
         - cat
